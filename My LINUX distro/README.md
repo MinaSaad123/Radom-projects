@@ -82,4 +82,3 @@ This command boots the ARM Versatile board with your Linux kernel and root files
 Once the system is running, you should see the prompt for your custom shell. Run your shell or other utilities inside the QEMU environment.
 
 ### [Screencast from 02 أكت, 2024 EEST 05:26:36 ص.webm](https://github.com/user-attachments/assets/3d757797-4014-4ee2-bffd-1030ec2ab186)
-9. Short Video
