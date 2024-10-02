@@ -59,7 +59,7 @@ mount -t proc none /proc
 mount -t sysfs none /sys
 mknod -m 660 /dev/mem c 1 1
 echo -e "\nHello!\n"
-exec /bin/shsh
+exec /bin/sh
 ```
 
 ### 5. Cross-Compile Your Shell and Utilities
