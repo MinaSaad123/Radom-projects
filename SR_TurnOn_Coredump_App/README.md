@@ -38,34 +38,39 @@ In another terminal, start the sender and provide the PID of the receiver:
 
 Follow the prompts to send signals:
 
-Enter 0 to send a SIGTERM signal (terminate).
+Enter 0 to send a termination signal.
 
-Enter 1 to send a SIGABRT signal (abort with a core dump).
+Enter 1 to send an abort signal (with core dump).
 
 ## Example Output
 
 ### Receiver Terminal
 
 `Receiver process started. PID: 12345
-Waiting for signals...
-Received SIGTERM (signal 15). Terminating...`
+Waiting for real-time signals...
+Received data 0. Terminating gracefully...`
 
 ### Sender Terminal
 
-`Enter the PID of the receiver process: 12345
+Enter the PID of the receiver process: 12345
 Enter 0 to terminate, 1 to abort: 0
-SIGTERM signal sent to process 12345`
+Signal sent with data 0 to process 12345`
 
-## Important Notes
+## Key Features
 
-System Call Validation: The code checks the return values of system calls like kill and signal. Any failures are logged with appropriate error messages.
+Real-Time Signals: The project uses SIGRTMIN for inter-process communication, allowing the sender to pass data along with the signal.
 
-Signal Handlers: Custom handlers for SIGTERM and SIGABRT ensure proper handling of termination and abort signals.
+Signal Handling: The receiver processes the data sent with the signal and performs actions such as termination or aborting with a core dump.
 
-Example Signals and Behaviors
+Error Handling: Both applications validate system calls and display appropriate error messages if a failure occurs.
 
-SIGTERM: Gracefully terminates the receiver process.
+## Example Signals and Behaviors
 
-SIGABRT: Aborts the receiver process and generates a core dump for debugging.
+Data = 0: Receiver terminates gracefully.
+
+Data = 1: Receiver aborts with a core dump.
+
+Invalid Data: Receiver ignores the signal and logs the invalid data.
+
 
 # Video
