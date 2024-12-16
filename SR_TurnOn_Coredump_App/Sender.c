@@ -3,10 +3,11 @@
 #include <signal.h>
 #include <unistd.h>
 
-int main() 
+int main()
 {
     pid_t receiver_pid;
     int input;
+    union sigval value;
 
     printf("Enter the PID of the receiver process: ");
     scanf("%d", &receiver_pid);
@@ -14,31 +15,18 @@ int main()
     printf("Enter 0 to terminate, 1 to abort: ");
     scanf("%d", &input);
 
-    if (input == 0) 
+    if (input == 0 || input == 1) 
     {
-        
-        if (kill(receiver_pid, SIGTERM) == -1) /* Send SIGTERM to the receiver*/
+        value.sival_int = input;
+        if (sigqueue(receiver_pid, SIGRTMIN, value) == -1) 
         {
-            perror("Failed to send SIGTERM");
-            exit(1);
+            perror("Failed to send signal");
+            exit(EXIT_FAILURE);
         }
+        printf("Signal sent with data %d to process %d\n", input, receiver_pid);
         
-        printf("SIGTERM signal sent to process %d\n", receiver_pid);
-    
-    } else if (input == 1) 
+    } else
     {
-        // Send SIGABRT to the receiver
-        if (kill(receiver_pid, SIGABRT) == -1) 
-        {
-            perror("Failed to send SIGABRT");
-            exit(1);
-        }
-        
-        printf("SIGABRT signal sent to process %d\n", receiver_pid);
-    
-    } else 
-    {
-        // Handle invalid input
         printf("Invalid input! Please enter 0 or 1.\n");
     }
 

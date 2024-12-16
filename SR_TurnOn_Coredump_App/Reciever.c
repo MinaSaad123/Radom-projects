@@ -3,38 +3,43 @@
 #include <signal.h>
 #include <unistd.h>
 
-// Handler for SIGTERM
-void handle_sigterm(int sig) 
+void handle_signal(int sig, siginfo_t *info, void *context)
 {
-    printf("Received SIGTERM (signal %d). Terminating...\n", sig);
-    exit(0);
-}
+    int data = info->si_value.sival_int; /* Retrieve the data sent with the signal*/
 
-// Handler for SIGABRT
-void handle_sigabrt(int sig) 
-{
-    printf("Received SIGABRT (signal %d). Aborting with core dump...\n", sig);
-    abort();
+    if (data == 0) 
+    {
+        printf("Received data 0. Terminating gracefully...\n");
+        exit(0);
+        
+    } else if (data == 1)
+    {
+        printf("Received data 1. Aborting with core dump...\n");
+        abort();
+        
+    } else
+    {
+        printf("Received invalid data: %d. Ignoring...\n", data);
+    }
 }
 
 int main()
 {
+    struct sigaction sa;
+
     printf("Receiver process started. PID: %d\n", getpid());
-    printf("Waiting for signals...\n");
+    printf("Waiting for real-time signals...\n");
 
-    // Register handlers for SIGTERM and SIGABRT
-    if (signal(SIGTERM, handle_sigterm) == -1)
+    sa.sa_sigaction = handle_signal;
+    sa.sa_flags = SA_SIGINFO; /* Use SA_SIGINFO to access the signal data*/
+    sigemptyset(&sa.sa_mask);
+
+    if (sigaction(SIGRTMIN, &sa, NULL) == -1)
     {
-        perror("Failed to set SIGTERM handler");
-        exit(1);
-    }
-    if (signal(SIGABRT, handle_sigabrt) == -1)
-    {
-        perror("Failed to set SIGABRT handler");
-        exit(1);
+        perror("Failed to set signal handler");
+        exit(EXIT_FAILURE);
     }
 
-    // Keep the process running to wait for signals
     while (1);
 
     return 0;
