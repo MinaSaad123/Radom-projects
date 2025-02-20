@@ -14,15 +14,23 @@ IPC mechanisms used:
 
 ## Flowchart
 ```mermaid
+
 graph TD;
-    A[Start] -->|Initialize Inventory| B[Shop Process];
-    B -->|Periodically Print Inventory| C[Output Inventory Data];
-    B -->|Receive Order via IPC (Message Queue/Shared Memory)| D[Customer Process];
-    D -->|Send Order Details via IPC| B;
-    B -->|Check Inventory| E{Stock Available?};
-    E --Yes--> F[Confirm Order];
-    E --No--> G[Reject Order];
-    B -->|Receive Restock/Price Update via IPC| H[Inventory Manager];
+    A(Start) -->|Initialize Inventory| B(Shop Process);
+    B -->|Periodically Print Inventory| C(Output Inventory Data);
+    
+    subgraph Customer Interaction
+        D(Customer Process) -->|Place Order| E{Check Inventory};
+        E --Yes--> F(Confirm Order);
+        E --No--> G(Reject Order);
+    end
+    
+    subgraph Inventory Management
+        H(Inventory Manager) -->|Restock or Update Prices| I(Send Updates to Shop);
+    end
+    
+    D -->|Send Order via IPC| B;
+    B -->|Receive Order via IPC| D;
     H -->|Send Updates via IPC| B;
     B -->|Update Inventory and Prices| C;
     C -->|Repeat Process| B;
