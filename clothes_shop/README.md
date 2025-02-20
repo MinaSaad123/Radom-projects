@@ -13,38 +13,39 @@ IPC mechanisms used:
 - **Semaphores** (for synchronization)
 
 ## Flowchart
+
 ```mermaid
 
 graph TD;
-    A(Start) -->|Initialize Inventory| B(Shop Process);
-    B -->|Periodically Print Inventory| C(Output Inventory Data);
+    Start -->|Initialize Inventory| Shop[Shop Process]
+    Start -->|User Orders| Customer[Customer Process]
+    Start -->|Restock/Update Price| Manager[Inventory Manager Process]
     
-    subgraph Customer Interaction
-        D(Customer Process) -->|Place Order| E{Check Inventory};
-        E --Yes--> F(Confirm Order);
-        E --No--> G(Reject Order);
-    end
+    Shop -->|Displays Inventory| Display[Print Inventory Every 5 Secs]
+    Customer -->|Requests Item| CheckStock{Check Stock}
+    CheckStock -- Enough Stock --> UpdateStock[Reduce Item Count]
+    CheckStock -- Not Enough Stock --> Notify[Notify User]
     
-    subgraph Inventory Management
-        H(Inventory Manager) -->|Restock or Update Prices| I(Send Updates to Shop);
-    end
+    Manager -->|Updates Stock/Price| ModifyInventory[Modify Inventory Data]
+    ModifyInventory --> NotifyManager[Confirm Update]
     
-    D -->|Send Order via IPC| B;
-    B -->|Receive Order via IPC| D;
-    H -->|Send Updates via IPC| B;
-    B -->|Update Inventory and Prices| C;
-    C -->|Repeat Process| B;
+    UpdateStock -->|Updated Inventory| Shop
+    ModifyInventory -->|Updated Inventory| Shop
+
+    Display -->|Repeat| Shop
+    Notify -->|Ask Again| Customer
+    NotifyManager -->|Ask Again| Manager
 ```
 
 ## How to Compile and Run
 ### **1. Compile the Program**
 ```bash
-gcc -o shop main.c inventory.c -lpthread -lrt
+gcc -o clothes_shop *.c
 ```
 
 ### **2. Run the Program**
 ```bash
-./shop
+./clothes_shop
 ```
 
 ## Expected Behavior
